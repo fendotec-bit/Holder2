@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsivo -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cadastro e Pesquisa</title>
   <style>
     body {
@@ -11,57 +11,44 @@
       font-family: Arial, sans-serif;
       background-color: #f4f4f4;
     }
-
     .container {
       width: 95%;
-      max-width: 600px; /* Limite para desktop */
+      max-width: 600px;
       margin: auto;
       background: white;
       padding: 15px;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
     }
-
     .tela { display: none; }
     .ativa { display: block; }
-
     h2 { text-align: center; font-size: 1.4em; }
-
     button {
       margin: 8px 0;
       padding: 12px;
       font-size: 1em;
       text-transform: uppercase;
-      width: 100%; /* ocupa toda a largura */
+      width: 100%;
     }
-
     input {
       margin: 8px 0;
       padding: 10px;
-      width: 100%; /* ocupa toda a largura */
+      width: 100%;
       font-size: 1em;
-      text-transform: uppercase;
       box-sizing: border-box;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 15px;
       font-size: 0.9em;
     }
-
     th, td {
       border: 1px solid #ccc;
       padding: 6px;
       text-align: center;
     }
-
-    th {
-      background-color: #eee;
-    }
-
-    /* Ajustes para telas muito pequenas */
+    th { background-color: #eee; }
     @media (max-width: 480px) {
       h2 { font-size: 1.2em; }
       button, input { font-size: 0.9em; }
@@ -84,9 +71,9 @@
     <div id="telaCadastro" class="tela">
       <h2>CADASTRO</h2>
       <form id="formCadastro">
-        <label>ITEM:<br><input type="text" name="item" required></label><br>
+        <label><h2>HLD</h2)>:<br><input type="number" name="item" required></label><br>
         <label>QUANTIDADE:<br><input type="number" name="quantidade" required></label><br>
-        <label>CAIXA:<br><input type="text" name="caixa" required></label><br>
+        <label><h2>CAIXA:</h2><br><input type="number" name="caixa" required></label><br>
         <button type="submit">SALVAR</button>
       </form>
       <button onclick="mostrarTela('telaInicial')">VOLTAR</button>
@@ -96,17 +83,17 @@
     <div id="telaPesquisa" class="tela">
       <h2>PESQUISAR</h2>
       <form id="formPesquisa">
-        <label>DIGITE O ITEM:<br><input type="text" name="busca"></label><br>
+        <label><h2>HLD</h2><br><input type="number" name="busca"></label><br>
         <button type="submit">BUSCAR</button>
       </form>
       <button onclick="mostrarTela('telaInicial')">VOLTAR</button>
     </div>
 
-    <!-- Tela de exclusão/edição por caixa -->
+    <!-- Tela de exclusão/edição -->
     <div id="telaExcluirCaixa" class="tela">
       <h2>EXCLUIR OU EDITAR POR CAIXA</h2>
       <form id="formCaixa">
-        <label>DIGITE O NÚMERO DA CAIXA:<br><input type="text" name="caixaBusca" required></label><br>
+        <label>DIGITE O NÚMERO DA CAIXA:<br><input type="number" name="caixaBusca" required></label><br>
         <button type="submit">MOSTRAR ITENS</button>
       </form>
       <button onclick="mostrarTela('telaInicial')">VOLTAR</button>
@@ -127,7 +114,6 @@
   </div>
 
   <script>
-    // Carregar registros do localStorage
     let registros = JSON.parse(localStorage.getItem('registros')) || [];
 
     function mostrarTela(id) {
@@ -135,27 +121,30 @@
       document.getElementById(id).classList.add('ativa');
     }
 
-    // Cadastro
+    // Cadastro com ID único e campos numéricos
     document.getElementById('formCadastro').addEventListener('submit', function(e) {
       e.preventDefault();
       const dados = new FormData(this);
-      const item = dados.get('item').toUpperCase();
-      const quantidade = dados.get('quantidade').toUpperCase();
-      const caixa = dados.get('caixa').toUpperCase();
-      registros.push({ item, quantidade, caixa });
+      const item = parseInt(dados.get('item'), 10);
+      const quantidade = parseInt(dados.get('quantidade'), 10);
+      const caixa = parseInt(dados.get('caixa'), 10);
+      const id = Date.now(); // ID único
+
+      registros.push({ id, item, quantidade, caixa });
       localStorage.setItem('registros', JSON.stringify(registros));
-      alert("CADASTRO SALVO:\nITEM: " + item + "\nQUANTIDADE: " + quantidade + "\nCAIXA: " + caixa);
+
+      alert(`CADASTRO SALVO:\nITEM: ${item}\nQUANTIDADE: ${quantidade}\nCAIXA: ${caixa}`);
       this.reset();
       mostrarTela('telaInicial');
     });
 
-    // Pesquisa
+    // Pesquisa por número do item
     document.getElementById('formPesquisa').addEventListener('submit', function(e) {
       e.preventDefault();
-      const busca = new FormData(this).get('busca').toUpperCase();
-      const resultado = registros.filter(r => r.item.includes(busca));
+      const busca = parseInt(new FormData(this).get('busca'), 10);
+      const resultado = registros.filter(r => r.item === busca);
       if (resultado.length > 0) {
-        alert("RESULTADOS ENCONTRADOS:\n" + resultado.map(r => r.item + " - " + r.quantidade + " (CAIXA: " + r.caixa + ")").join("\n"));
+        alert("RESULTADOS ENCONTRADOS:\n" + resultado.map(r => `${r.item} - ${r.quantidade} (CAIXA: ${r.caixa})`).join("\n"));
       } else {
         alert("NENHUM ITEM ENCONTRADO.");
       }
@@ -164,7 +153,7 @@
     // Exibir itens da caixa
     document.getElementById('formCaixa').addEventListener('submit', function(e) {
       e.preventDefault();
-      const caixaBusca = new FormData(this).get('caixaBusca').toUpperCase();
+      const caixaBusca = parseInt(new FormData(this).get('caixaBusca'), 10);
       const tbody = document.querySelector('#tabelaExcluir tbody');
       tbody.innerHTML = '';
       const resultado = registros.filter(r => r.caixa === caixaBusca);
@@ -172,11 +161,11 @@
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${r.item}</td>
-          <td id="qtd-${index}">${r.quantidade}</td>
+          <td>${r.quantidade}</td>
           <td>${r.caixa}</td>
           <td>
-            <button onclick="excluirRegistroPorCaixa('${caixaBusca}', ${index})">EXCLUIR</button>
-            <button onclick="editarQuantidade('${caixaBusca}', ${index})">ALTERAR QUANTIDADE</button>
+            <button onclick="excluirRegistro(${r.id})">EXCLUIR</button>
+            <button onclick="editarRegistro(${r.id}, ${index}, ${caixaBusca})">EDITAR</button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -186,43 +175,47 @@
       }
     });
 
-    // Excluir registro
-    function excluirRegistroPorCaixa(caixaBusca, indexNaLista) {
-      const itensCaixa = registros.filter(r => r.caixa === caixaBusca);
-      const itemRemovido = itensCaixa[indexNaLista];
-      registros = registros.filter(r => !(r.item === itemRemovido.item && r.caixa === itemRemovido.caixa && r.quantidade === itemRemovido.quantidade));
+    // Excluir pelo ID
+    function excluirRegistro(id) {
+      const itemRemovido = registros.find(r => r.id === id);
+      registros = registros.filter(r => r.id !== id);
       localStorage.setItem('registros', JSON.stringify(registros));
-      alert("ITEM EXCLUÍDO: " + itemRemovido.item + " (CAIXA " + itemRemovido.caixa + ")");
+      alert(`ITEM EXCLUÍDO: ${itemRemovido.item} (CAIXA ${itemRemovido.caixa})`);
       document.getElementById('formCaixa').dispatchEvent(new Event('submit'));
     }
 
-    // Editar quantidade inline
-    function editarQuantidade(caixaBusca, indexNaLista) {
+    // Editar todos os campos inline
+    function editarRegistro(id, indexNaLista, caixaBusca) {
       const itensCaixa = registros.filter(r => r.caixa === caixaBusca);
-      const itemSelecionado = itensCaixa[indexNaLista];
-      const celulaQtd = document.getElementById(`qtd-${indexNaLista}`);
+      const itemSelecionado = itensCaixa.find(r => r.id === id);
 
-           celulaQtd.innerHTML = `
-        <input type="number" id="novoQtd-${indexNaLista}" value="${itemSelecionado.quantidade}" style="width:60px;text-transform:uppercase;">
-        <button onclick="salvarQuantidade('${caixaBusca}', ${indexNaLista})">SALVAR</button>
+      const tr = document.querySelector(`#tabelaExcluir tbody`).children[indexNaLista];
+      tr.innerHTML = `
+        <td><input type="number" id="novoItem-${id}" value="${itemSelecionado.item}"></td>
+        <td><input type="number" id="novoQtd-${id}" value="${itemSelecionado.quantidade}" style="width:60px;"></td>
+        <td><input type="number" id="novoCaixa-${id}" value="${itemSelecionado.caixa}"></td>
+        <td>
+          <button onclick="salvarRegistro(${id}, ${caixaBusca})">SALVAR</button>
+          <button onclick="document.getElementById('formCaixa').dispatchEvent(new Event('submit'))">CANCELAR</button>
+        </td>
       `;
     }
 
-    function salvarQuantidade(caixaBusca, indexNaLista) {
-      const novaQtd = document.getElementById(`novoQtd-${indexNaLista}`).value.toUpperCase();
-      const itensCaixa = registros.filter(r => r.caixa === caixaBusca);
-      const itemSelecionado = itensCaixa[indexNaLista];
+        // Salvar alterações pelo ID
+    function salvarRegistro(id, caixaBusca) {
+      const novoItem = parseInt(document.getElementById(`novoItem-${id}`).value, 10);
+      const novaQtd = parseInt(document.getElementById(`novoQtd-${id}`).value, 10);
+      const novoCaixa = parseInt(document.getElementById(`novoCaixa-${id}`).value, 10);
 
       registros = registros.map(r => {
-        if (r.item === itemSelecionado.item && r.caixa === itemSelecionado.caixa) {
-          return { ...r, quantidade: novaQtd };
+        if (r.id === id) {
+          return { ...r, item: novoItem, quantidade: novaQtd, caixa: novoCaixa };
         }
         return r;
       });
 
       localStorage.setItem('registros', JSON.stringify(registros));
-      alert("QUANTIDADE ALTERADA: " + itemSelecionado.item + " agora tem " + novaQtd);
-      // Recarrega a tabela para mostrar o valor atualizado
+      alert(`ITEM ALTERADO:\n${novoItem} - ${novaQtd} (CAIXA: ${novoCaixa})`);
       document.getElementById('formCaixa').dispatchEvent(new Event('submit'));
     }
   </script>
