@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsivo -->
+  <title>Cadastro e Pesquisa</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      width: 95%;
+      max-width: 600px; /* Limite para desktop */
+      margin: auto;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+
+    .tela { display: none; }
+    .ativa { display: block; }
+
+    h2 { text-align: center; font-size: 1.4em; }
+
+    button {
+      margin: 8px 0;
+      padding: 12px;
+      font-size: 1em;
+      text-transform: uppercase;
+      width: 100%; /* ocupa toda a largura */
+    }
+
+    input {
+      margin: 8px 0;
+      padding: 10px;
+      width: 100%; /* ocupa toda a largura */
+      font-size: 1em;
+      text-transform: uppercase;
+      box-sizing: border-box;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 0.9em;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #eee;
+    }
+
+    /* Ajustes para telas muito pequenas */
+    @media (max-width: 480px) {
+      h2 { font-size: 1.2em; }
+      button, input { font-size: 0.9em; }
+      table { font-size: 0.8em; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Tela inicial -->
+    <div id="telaInicial" class="tela ativa">
+      <h2>BEM-VINDO</h2>
+      <button onclick="mostrarTela('telaCadastro')">CADASTRO</button>
+      <button onclick="mostrarTela('telaPesquisa')">PESQUISAR</button>
+      <button onclick="mostrarTela('telaExcluirCaixa')">EXCLUIR / EDITAR</button>
+    </div>
+
+    <!-- Tela de cadastro -->
+    <div id="telaCadastro" class="tela">
+      <h2>CADASTRO</h2>
+      <form id="formCadastro">
+        <label>ITEM:<br><input type="text" name="item" required></label><br>
+        <label>QUANTIDADE:<br><input type="number" name="quantidade" required></label><br>
+        <label>CAIXA:<br><input type="text" name="caixa" required></label><br>
+        <button type="submit">SALVAR</button>
+      </form>
+      <button onclick="mostrarTela('telaInicial')">VOLTAR</button>
+    </div>
+
+    <!-- Tela de pesquisa -->
+    <div id="telaPesquisa" class="tela">
+      <h2>PESQUISAR</h2>
+      <form id="formPesquisa">
+        <label>DIGITE O ITEM:<br><input type="text" name="busca"></label><br>
+        <button type="submit">BUSCAR</button>
+      </form>
+      <button onclick="mostrarTela('telaInicial')">VOLTAR</button>
+    </div>
+
+    <!-- Tela de exclusão/edição por caixa -->
+    <div id="telaExcluirCaixa" class="tela">
+      <h2>EXCLUIR OU EDITAR POR CAIXA</h2>
+      <form id="formCaixa">
+        <label>DIGITE O NÚMERO DA CAIXA:<br><input type="text" name="caixaBusca" required></label><br>
+        <button type="submit">MOSTRAR ITENS</button>
+      </form>
+      <button onclick="mostrarTela('telaInicial')">VOLTAR</button>
+
+      <h3>ITENS DA CAIXA</h3>
+      <table id="tabelaExcluir">
+        <thead>
+          <tr>
+            <th>ITEM</th>
+            <th>QUANTIDADE</th>
+            <th>CAIXA</th>
+            <th>AÇÕES</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Carregar registros do localStorage
+    let registros = JSON.parse(localStorage.getItem('registros')) || [];
+
+    function mostrarTela(id) {
+      document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+      document.getElementById(id).classList.add('ativa');
+    }
+
+    // Cadastro
+    document.getElementById('formCadastro').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const dados = new FormData(this);
+      const item = dados.get('item').toUpperCase();
+      const quantidade = dados.get('quantidade').toUpperCase();
+      const caixa = dados.get('caixa').toUpperCase();
+      registros.push({ item, quantidade, caixa });
+      localStorage.setItem('registros', JSON.stringify(registros));
+      alert("CADASTRO SALVO:\nITEM: " + item + "\nQUANTIDADE: " + quantidade + "\nCAIXA: " + caixa);
+      this.reset();
+      mostrarTela('telaInicial');
+    });
+
+    // Pesquisa
+    document.getElementById('formPesquisa').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const busca = new FormData(this).get('busca').toUpperCase();
+      const resultado = registros.filter(r => r.item.includes(busca));
+      if (resultado.length > 0) {
+        alert("RESULTADOS ENCONTRADOS:\n" + resultado.map(r => r.item + " - " + r.quantidade + " (CAIXA: " + r.caixa + ")").join("\n"));
+      } else {
+        alert("NENHUM ITEM ENCONTRADO.");
+      }
+    });
+
+    // Exibir itens da caixa
+    document.getElementById('formCaixa').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const caixaBusca = new FormData(this).get('caixaBusca').toUpperCase();
+      const tbody = document.querySelector('#tabelaExcluir tbody');
+      tbody.innerHTML = '';
+      const resultado = registros.filter(r => r.caixa === caixaBusca);
+      resultado.forEach((r, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${r.item}</td>
+          <td id="qtd-${index}">${r.quantidade}</td>
+          <td>${r.caixa}</td>
+          <td>
+            <button onclick="excluirRegistroPorCaixa('${caixaBusca}', ${index})">EXCLUIR</button>
+            <button onclick="editarQuantidade('${caixaBusca}', ${index})">ALTERAR QUANTIDADE</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      if (resultado.length === 0) {
+        alert("NENHUM ITEM ENCONTRADO NA CAIXA " + caixaBusca);
+      }
+    });
+
+    // Excluir registro
+    function excluirRegistroPorCaixa(caixaBusca, indexNaLista) {
+      const itensCaixa = registros.filter(r => r.caixa === caixaBusca);
+      const itemRemovido = itensCaixa[indexNaLista];
+      registros = registros.filter(r => !(r.item === itemRemovido.item && r.caixa === itemRemovido.caixa && r.quantidade === itemRemovido.quantidade));
+      localStorage.setItem('registros', JSON.stringify(registros));
+      alert("ITEM EXCLUÍDO: " + itemRemovido.item + " (CAIXA " + itemRemovido.caixa + ")");
+      document.getElementById('formCaixa').dispatchEvent(new Event('submit'));
+    }
+
+    // Editar quantidade inline
+    function editarQuantidade(caixaBusca, indexNaLista) {
+      const itensCaixa = registros.filter(r => r.caixa === caixaBusca);
+      const itemSelecionado = itensCaixa[indexNaLista];
+      const celulaQtd = document.getElementById(`qtd-${indexNaLista}`);
+
+           celulaQtd.innerHTML = `
+        <input type="number" id="novoQtd-${indexNaLista}" value="${itemSelecionado.quantidade}" style="width:60px;text-transform:uppercase;">
+        <button onclick="salvarQuantidade('${caixaBusca}', ${indexNaLista})">SALVAR</button>
+      `;
+    }
+
+    function salvarQuantidade(caixaBusca, indexNaLista) {
+      const novaQtd = document.getElementById(`novoQtd-${indexNaLista}`).value.toUpperCase();
+      const itensCaixa = registros.filter(r => r.caixa === caixaBusca);
+      const itemSelecionado = itensCaixa[indexNaLista];
+
+      registros = registros.map(r => {
+        if (r.item === itemSelecionado.item && r.caixa === itemSelecionado.caixa) {
+          return { ...r, quantidade: novaQtd };
+        }
+        return r;
+      });
+
+      localStorage.setItem('registros', JSON.stringify(registros));
+      alert("QUANTIDADE ALTERADA: " + itemSelecionado.item + " agora tem " + novaQtd);
+      // Recarrega a tabela para mostrar o valor atualizado
+      document.getElementById('formCaixa').dispatchEvent(new Event('submit'));
+    }
+  </script>
+
+</body>
+</html>
