@@ -2,223 +2,258 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cadastro e Pesquisa</title>
+  <title>Controle de Holder</title>
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 20px; 
+      background-color: #d3d3d3; 
+      color: #333;
+      transition: background-color 0.3s, color 0.3s;
     }
-    .container {
-      width: 95%;
-      max-width: 600px;
+    h1 { text-align: center; }
+    .tela { display: none; margin-top: 20px; }
+    .ativo { display: block; }
+    button { 
+      margin: 5px; 
+      padding: 8px 15px; 
+      border: none; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    #principal button { background-color: #007bff; color: white; }
+    #cadastro button[type="submit"] { background-color: #28a745; color: white; }
+    #cadastro button, #pesquisa button { background-color: #6c757d; color: white; }
+    .btn-saida { background-color: #dc3545; color: white; }
+    .btn-entrada { background-color: #28a745; color: white; }
+    .btn-excluir { background-color: #ff5733; color: white; }
+    .btn-limpar { background-color: #ffc107; color: black; }
+    .btn-darkmode { background-color: #343a40; color: white; }
+
+    table { 
+      border-collapse: collapse; 
+      width: 100%; 
+      margin-top: 10px; 
+      background: #fff; 
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.3s, color 0.3s;
+    }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f8f9fa; }
+    input { 
+      text-transform: uppercase; 
+      width: 100%; 
+      padding: 6px; 
+      border: 1px solid #aaa; 
+      border-radius: 4px;
+    }
+    .form-campos {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      max-width: 400px;
       margin: auto;
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
     }
-    .tela { display: none; }
-    .ativa { display: block; }
-    h2 { text-align: center; font-size: 1.4em; }
-    button {
-      margin: 8px 0;
-      padding: 12px;
-      font-size: 1em;
-      text-transform: uppercase;
-      width: 100%;
+    .form-campos label { font-weight: bold; }
+
+    body.dark { background-color: #121212; color: #e0e0e0; }
+    body.dark table { background-color: #1e1e1e; color: #e0e0e0; }
+    body.dark th { background-color: #333; }
+
+    /* Notificações */
+    #notificacoes { position:fixed; top:20px; right:20px; z-index:9999; }
+    .notificacao {
+      margin-bottom: 10px;
+      padding: 10px 15px;
+      border-radius: 6px;
+      color: #fff;
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      opacity: 0.95;
     }
-    input {
-      margin: 8px 0;
-      padding: 10px;
-      width: 100%;
-      font-size: 1em;
-      box-sizing: border-box;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-      font-size: 0.9em;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 6px;
-      text-align: center;
-    }
-    th { background-color: #eee; }
-    @media (max-width: 480px) {
-      h2 { font-size: 1.2em; }
-      button, input { font-size: 0.9em; }
-      table { font-size: 0.8em; }
-    }
+    .sucesso { background-color: #28a745; }
+    .erro { background-color: #dc3545; }
+    .aviso { background-color: #ffc107; color: #000; }
+    .info { background-color: #007bff; }
   </style>
 </head>
 <body>
-
-  <div class="container">
-    <!-- Tela inicial -->
-    <div id="telaInicial" class="tela ativa">
-      <h2>BEM-VINDO</h2>
-      <button onclick="mostrarTela('telaCadastro')">CADASTRO</button>
-      <button onclick="mostrarTela('telaPesquisa')">PESQUISAR</button>
-      <button onclick="mostrarTela('telaExcluirCaixa')">EXCLUIR / EDITAR</button>
-    </div>
-
-    <!-- Tela de cadastro -->
-    <div id="telaCadastro" class="tela">
-      <h2>CADASTRO</h2>
-      <form id="formCadastro">
-        <label><h2>HLD</h2)>:<br><input type="number" name="item" required></label><br>
-        <label>QUANTIDADE:<br><input type="number" name="quantidade" required></label><br>
-        <label><h2>CAIXA:</h2><br><input type="number" name="caixa" required></label><br>
-        <button type="submit">SALVAR</button>
-      </form>
-      <button onclick="mostrarTela('telaInicial')">VOLTAR</button>
-    </div>
-
-    <!-- Tela de pesquisa -->
-    <div id="telaPesquisa" class="tela">
-      <h2>PESQUISAR</h2>
-      <form id="formPesquisa">
-        <label><h2>HLD</h2><br><input type="number" name="busca"></label><br>
-        <button type="submit">BUSCAR</button>
-      </form>
-      <button onclick="mostrarTela('telaInicial')">VOLTAR</button>
-    </div>
-
-    <!-- Tela de exclusão/edição -->
-    <div id="telaExcluirCaixa" class="tela">
-      <h2>EXCLUIR OU EDITAR POR CAIXA</h2>
-      <form id="formCaixa">
-        <label>DIGITE O NÚMERO DA CAIXA:<br><input type="number" name="caixaBusca" required></label><br>
-        <button type="submit">MOSTRAR ITENS</button>
-      </form>
-      <button onclick="mostrarTela('telaInicial')">VOLTAR</button>
-
-      <h3>ITENS DA CAIXA</h3>
-      <table id="tabelaExcluir">
-        <thead>
-          <tr>
-            <th>ITEM</th>
-            <th>QUANTIDADE</th>
-            <th>CAIXA</th>
-            <th>AÇÕES</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
+  <h1>Controle de Holder</h1>
+  
+  <!-- Botão Dark Mode -->
+  <div style="text-align:center;">
+    <button class="btn-darkmode" onclick="toggleDarkMode()">🌙 Alternar Dark Mode</button>
+  </div>
+  
+  <!-- Tela principal -->
+  <div id="principal" class="ativo" style="text-align:center;">
+    <button onclick="abrirTela('cadastro')">➕ Cadastro</button>
+    <button onclick="abrirTela('pesquisa')">🔍 Pesquisa</button>
+  </div>
+  
+  <!-- Tela de Cadastro -->
+  <div id="cadastro" class="tela">
+    <h2>Cadastro de Holder</h2>
+    <form id="formCadastro" class="form-campos">
+      <label>HLD:
+        <input type="text" id="nome" required>
+      </label>
+      <label>Quantidade:
+        <input type="number" id="quantidade" required>
+      </label>
+      <label>Caixa:
+        <input type="number" id="setor" required>
+      </label>
+      <button type="submit">💾 Salvar</button>
+    </form>
+    <button onclick="abrirTela('principal')">⬅️ Voltar</button>
+  </div>
+  
+  <!-- Tela de Pesquisa -->
+  <div id="pesquisa" class="tela">
+    <h2>Pesquisa por Holder</h2>
+    <input type="text" id="busca" placeholder="Digite o nome do Holder">
+    <button onclick="pesquisar()">🔍 Pesquisar</button>
+    <button class="btn-limpar" onclick="limparPesquisa()">🧹 Limpar pesquisa</button>
+    <table id="tabela">
+      <thead>
+        <tr><th>HLD</th><th>Quantidade</th><th>CAIXA</th><th>Ações</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div id="mensagem"></div>
+    <button onclick="abrirTela('principal')">⬅️ Voltar</button>
   </div>
 
+  <!-- Container de notificações -->
+  <div id="notificacoes"></div>
+  
   <script>
-    let registros = JSON.parse(localStorage.getItem('registros')) || [];
+    let estoque = JSON.parse(localStorage.getItem("estoque")) || [];
 
-    function mostrarTela(id) {
-      document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
-      document.getElementById(id).classList.add('ativa');
+    function salvarEstoque() {
+      localStorage.setItem("estoque", JSON.stringify(estoque));
     }
 
-    // Cadastro com ID único e campos numéricos
+    function abrirTela(tela) {
+      document.querySelectorAll('.tela, #principal').forEach(div => div.classList.remove('ativo'));
+      document.getElementById(tela).classList.add('ativo');
+      if (tela === 'principal') {
+        limparPesquisa();
+      }
+    }
+
+    function mostrarNotificacao(mensagem, tipo="info") {
+      const container = document.getElementById("notificacoes");
+      const notif = document.createElement("div");
+      notif.textContent = mensagem;
+      notif.classList.add("notificacao");
+      notif.classList.add(tipo);
+      container.appendChild(notif);
+      setTimeout(() => notif.remove(), 3000);
+    }
+
+    // Cadastro com verificação de duplicados
     document.getElementById('formCadastro').addEventListener('submit', function(e) {
       e.preventDefault();
-      const dados = new FormData(this);
-      const item = parseInt(dados.get('item'), 10);
-      const quantidade = parseInt(dados.get('quantidade'), 10);
-      const caixa = parseInt(dados.get('caixa'), 10);
-      const id = Date.now(); // ID único
+      let nome = document.getElementById('nome').value.toUpperCase();
+      let quantidade = parseInt(document.getElementById('quantidade').value);
+      let setor = parseInt(document.getElementById('setor').value);
 
-      registros.push({ id, item, quantidade, caixa });
-      localStorage.setItem('registros', JSON.stringify(registros));
-
-      alert(`CADASTRO SALVO:\nITEM: ${item}\nQUANTIDADE: ${quantidade}\nCAIXA: ${caixa}`);
-      this.reset();
-      mostrarTela('telaInicial');
-    });
-
-    // Pesquisa por número do item
-    document.getElementById('formPesquisa').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const busca = parseInt(new FormData(this).get('busca'), 10);
-      const resultado = registros.filter(r => r.item === busca);
-      if (resultado.length > 0) {
-        alert("RESULTADOS ENCONTRADOS:\n" + resultado.map(r => `${r.item} - ${r.quantidade} (CAIXA: ${r.caixa})`).join("\n"));
+      let existe = estoque.some(item => item.nome === nome);
+      if (existe) {
+        mostrarNotificacao("Produto já existe no estoque!", "aviso");
       } else {
-        alert("NENHUM ITEM ENCONTRADO.");
+        estoque.push({ nome, quantidade, setor });
+        salvarEstoque();
+        mostrarNotificacao("Produto cadastrado com sucesso!", "sucesso");
+        this.reset();
       }
     });
 
-    // Exibir itens da caixa
-    document.getElementById('formCaixa').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const caixaBusca = parseInt(new FormData(this).get('caixaBusca'), 10);
-      const tbody = document.querySelector('#tabelaExcluir tbody');
-      tbody.innerHTML = '';
-      const resultado = registros.filter(r => r.caixa === caixaBusca);
-      resultado.forEach((r, index) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${r.item}</td>
-          <td>${r.quantidade}</td>
-          <td>${r.caixa}</td>
-          <td>
-            <button onclick="excluirRegistro(${r.id})">EXCLUIR</button>
-            <button onclick="editarRegistro(${r.id}, ${index}, ${caixaBusca})">EDITAR</button>
-          </td>
+    function pesquisar() {
+      let termo = document.getElementById('busca').value.toLowerCase();
+      let resultados = estoque.map((item, idx) => ({...item, idx}))
+                              .filter(item => item.nome.toLowerCase().includes(termo));
+
+      let tbody = document.querySelector('#tabela tbody');
+      let mensagem = document.getElementById('mensagem');
+      tbody.innerHTML = "";
+      mensagem.innerHTML = "";
+
+      if (resultados.length === 0) {
+        mensagem.innerHTML = `
+          <p>Produto não encontrado.</p>
+          <button onclick="abrirTela('cadastro')">➕ Cadastrar novo produto</button>
         `;
-        tbody.appendChild(tr);
-      });
-      if (resultado.length === 0) {
-        alert("NENHUM ITEM ENCONTRADO NA CAIXA " + caixaBusca);
+      } else {
+        resultados.forEach(item => {
+          let linha = `
+            <tr>
+              <td>${item.nome}</td>
+              <td>${item.quantidade}</td>
+              <td>${item.setor}</td>
+              <td>
+                <button class="btn-saida" onclick="saidaProduto(${item.idx})">❌ Saída</button>
+                <button class="btn-entrada" onclick="entradaProduto(${item.idx})">✅ Entrada</button>
+                <button class="btn-excluir" onclick="excluirProduto(${item.idx})">🗑️ Excluir</button>
+              </td>
+            </tr>`;
+          tbody.innerHTML += linha;
+        });
       }
-    });
-
-    // Excluir pelo ID
-    function excluirRegistro(id) {
-      const itemRemovido = registros.find(r => r.id === id);
-      registros = registros.filter(r => r.id !== id);
-      localStorage.setItem('registros', JSON.stringify(registros));
-      alert(`ITEM EXCLUÍDO: ${itemRemovido.item} (CAIXA ${itemRemovido.caixa})`);
-      document.getElementById('formCaixa').dispatchEvent(new Event('submit'));
     }
 
-    // Editar todos os campos inline
-    function editarRegistro(id, indexNaLista, caixaBusca) {
-      const itensCaixa = registros.filter(r => r.caixa === caixaBusca);
-      const itemSelecionado = itensCaixa.find(r => r.id === id);
-
-      const tr = document.querySelector(`#tabelaExcluir tbody`).children[indexNaLista];
-      tr.innerHTML = `
-        <td><input type="number" id="novoItem-${id}" value="${itemSelecionado.item}"></td>
-        <td><input type="number" id="novoQtd-${id}" value="${itemSelecionado.quantidade}" style="width:60px;"></td>
-        <td><input type="number" id="novoCaixa-${id}" value="${itemSelecionado.caixa}"></td>
-        <td>
-          <button onclick="salvarRegistro(${id}, ${caixaBusca})">SALVAR</button>
-          <button onclick="document.getElementById('formCaixa').dispatchEvent(new Event('submit'))">CANCELAR</button>
-        </td>
-      `;
+        function limparPesquisa() {
+      document.getElementById('busca').value = "";
+      document.querySelector('#tabela tbody').innerHTML = "";
+      document.getElementById('mensagem').innerHTML = "";
     }
 
-        // Salvar alterações pelo ID
-    function salvarRegistro(id, caixaBusca) {
-      const novoItem = parseInt(document.getElementById(`novoItem-${id}`).value, 10);
-      const novaQtd = parseInt(document.getElementById(`novoQtd-${id}`).value, 10);
-      const novoCaixa = parseInt(document.getElementById(`novoCaixa-${id}`).value, 10);
-
-      registros = registros.map(r => {
-        if (r.id === id) {
-          return { ...r, item: novoItem, quantidade: novaQtd, caixa: novoCaixa };
+    function saidaProduto(index) {
+      let qtdSaida = prompt("Digite a quantidade de saída para " + estoque[index].nome);
+      if (qtdSaida !== null && !isNaN(qtdSaida)) {
+        qtdSaida = parseInt(qtdSaida);
+        if (qtdSaida > 0 && qtdSaida <= estoque[index].quantidade) {
+          estoque[index].quantidade -= qtdSaida;
+          salvarEstoque();
+          mostrarNotificacao("Saída registrada com sucesso!", "sucesso");
+          pesquisar();
+        } else {
+          mostrarNotificacao("Quantidade inválida. A saída não pode ser maior que o estoque atual.", "erro");
         }
-        return r;
-      });
+      }
+    }
 
-      localStorage.setItem('registros', JSON.stringify(registros));
-      alert(`ITEM ALTERADO:\n${novoItem} - ${novaQtd} (CAIXA: ${novoCaixa})`);
-      document.getElementById('formCaixa').dispatchEvent(new Event('submit'));
+    function entradaProduto(index) {
+      let qtdEntrada = prompt("Digite a quantidade de entrada para " + estoque[index].nome);
+      if (qtdEntrada !== null && !isNaN(qtdEntrada)) {
+        qtdEntrada = parseInt(qtdEntrada);
+        if (qtdEntrada > 0) {
+          estoque[index].quantidade += qtdEntrada;
+          salvarEstoque();
+          mostrarNotificacao("Entrada registrada com sucesso!", "sucesso");
+          pesquisar();
+        } else {
+          mostrarNotificacao("Quantidade inválida. A entrada deve ser maior que zero.", "erro");
+        }
+      }
+    }
+
+    function excluirProduto(index) {
+      if (confirm("Tem certeza que deseja excluir o produto " + estoque[index].nome + "?")) {
+        estoque.splice(index, 1); // remove o item do array
+        salvarEstoque();
+        mostrarNotificacao("Produto excluído com sucesso!", "sucesso");
+        pesquisar(); // atualiza a tabela
+      }
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
     }
   </script>
-
 </body>
 </html>
